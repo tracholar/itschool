@@ -63,7 +63,8 @@ for d in data[:3]:
     ids = [i for i,_ in ts]
     zh = translator.translate( [q for _, q in ts], src='en', dest='zh-CN')
 
-    ps = sorted(ps.extend([(i, a.text) for i,a in zip(ids, zh)]), key=lambda x:x[0])
+    #print zh
+    ps = sorted(ps + [(i, a.text) for i,a in zip(ids, zh)], key=lambda x:x[0])
     res = '\n'.join([q for _, q in ps]).replace('</ ', '</')
     print res
     out.append(res)
