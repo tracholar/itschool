@@ -50,13 +50,9 @@ data = T.findall('//div[@class="post-text"]')
 
 out = []
 for d in data:
-    xs = d.findall('./')
-
-    ps = []
-
-    for x in xs:
-        ps.append(translator.translate( dom_to_html(x) ).text)
-    out.append('\n'.join(ps))
+    xs = translator.translate( dom_to_html(d) , src='en', dest='zh-CN').text
+    print xs
+    out.append(xs)
 
 fp = open('out.html', 'w')
-fp.write('\n'.join(out))
+fp.write('\n'.join(out).encode('utf-8'))
