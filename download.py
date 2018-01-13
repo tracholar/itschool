@@ -43,31 +43,34 @@ def dom_to_html(T):
     return etree.tostring(T, pretty_print=True)
 
 
-url = "https://stackoverflow.com/questions/231767/what-does-the-yield-keyword-do"
+
+def trans_so_from_url(url):
+    T = get_dom_from_url(url)
+    data = T.findall('//div[@class="post-text"]')
+
+    out = []
+    for d in data[:3]:
+        xs = d.findall('./')
+        ps = []
+        ts = [] #fanyi
+        for i, x in enumerate(xs):
+            if x.tag in ('p', 'ul', 'ol'):
+                ts.append((i, dom_to_html(x)))
+            else:
+                ps.append((i, dom_to_html(x)))
+
+        ids = [i for i,_ in ts]
+        zh = translator.translate( [q for _, q in ts], src='en', dest='zh-CN')
+
+        #print zh
+        ps = sorted(ps + [(i, a.text) for i,a in zip(ids, zh)], key=lambda x:x[0])
+        res = '\n'.join([q for _, q in ps]).replace('</ ', '</')
+        #print res
+        out.append(res)
+    return '\n'.join(out).encode('utf-8')
 
 
-T = get_dom_from_url(url)
-data = T.findall('//div[@class="post-text"]')
+#url = "https://stackoverflow.com/questions/231767/what-does-the-yield-keyword-do"
 
-out = []
-for d in data[:3]:
-    xs = d.findall('./')
-    ps = []
-    ts = [] #fanyi
-    for i, x in enumerate(xs):
-        if x.tag in ('p', 'ul', 'ol'):
-            ts.append((i, dom_to_html(x)))
-        else:
-            ps.append((i, dom_to_html(x)))
-
-    ids = [i for i,_ in ts]
-    zh = translator.translate( [q for _, q in ts], src='en', dest='zh-CN')
-
-    #print zh
-    ps = sorted(ps + [(i, a.text) for i,a in zip(ids, zh)], key=lambda x:x[0])
-    res = '\n'.join([q for _, q in ps]).replace('</ ', '</')
-    print res
-    out.append(res)
-
-fp = open('out.html', 'w')
-fp.write('\n'.join(out).encode('utf-8'))
+url = sys.argv[1]
+print trans_so_from_url(url)
