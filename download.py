@@ -35,6 +35,7 @@ def get_dom_from_html(html):
 
 def get_dom_from_url(url):
     html = get_data_from_url(url)
+    html = html.replace('<ol>', '<ul>').replace('</ol>', '</ul>').replace('<sub>', '').replace('</sub>', '')
     T = get_dom_from_html(html)
     return T
 
@@ -49,16 +50,18 @@ T = get_dom_from_url(url)
 data = T.findall('//div[@class="post-text"]')
 
 out = []
-for d in data:
+for d in data[:3]:
     xs = d.findall('./')
     ps = []
     for x in xs:
-        if x.tag == 'p':
+        if x.tag in ('p', 'ul', 'ol'):
             ps.append(translator.translate( dom_to_html(x) , src='en', dest='zh-CN').text)
         else:
             ps.append(dom_to_html(x))
 
-    out.append('\n'.join(xs))
+    res = '\n'.join(ps).replace('</ ', '</')
+    print res
+    out.append(res)
 
 fp = open('out.html', 'w')
 fp.write('\n'.join(out).encode('utf-8'))
