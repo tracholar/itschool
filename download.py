@@ -42,7 +42,7 @@ def get_dom_from_url(url):
     return T
 
 def dom_to_html(T):
-    return etree.tostring(T, pretty_print=True)
+    return etree.tostring(T, method='html')
 
 
 
@@ -89,7 +89,7 @@ if __name__ == '__main__':
                 url = url[:-1]
             wfname = os.path.basename(url)
             fp = open(args.output + '/' + wfname + '.html', 'w')
-            fp.write(trans_so_from_url(url).encode('utf-8'))
+            fp.write(trans_so_from_url(url))
             fp.close()
 
     elif args.url:
@@ -98,5 +98,5 @@ if __name__ == '__main__':
             print trans_so_from_url(url)
         else:
             fp = open(args.output, 'w')
-            fp.write(trans_so_from_url(url).encode('utf-8'))
+            fp.write(trans_so_from_url(url))
             fp.close()
