@@ -53,13 +53,18 @@ out = []
 for d in data[:3]:
     xs = d.findall('./')
     ps = []
-    for x in xs:
+    ts = [] #fanyi
+    for i, x in enumerate(xs):
         if x.tag in ('p', 'ul', 'ol'):
-            ps.append(translator.translate( dom_to_html(x) , src='en', dest='zh-CN').text)
+            ts.append((i, dom_to_html(x)))
         else:
-            ps.append(dom_to_html(x))
+            ps.append((i, dom_to_html(x)))
 
-    res = '\n'.join(ps).replace('</ ', '</')
+    ids = [i for i,_ in ts]
+    zh = translator.translate( [q for _, q in ts], src='en', dest='zh-CN')
+
+    ps = sorted(ps.extend([(i, a.text) for i,a in zip(ids, zh)]), key=lambda x:x[0])
+    res = '\n'.join([q for _, q in ps]).replace('</ ', '</')
     print res
     out.append(res)
 
