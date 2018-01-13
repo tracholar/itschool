@@ -7,6 +7,8 @@ from HTMLParser import HTMLParser
 import thread, threading, sys
 
 from googletrans import Translator
+from argparse import ArgumentParser
+
 translator = Translator()
 
 
@@ -72,5 +74,29 @@ def trans_so_from_url(url):
 
 #url = "https://stackoverflow.com/questions/231767/what-does-the-yield-keyword-do"
 
-url = sys.argv[1]
-print trans_so_from_url(url)
+if __name__ == '__main__':
+    paser = ArgumentParser()
+    paser.add_argument("-f","--file", dest="file", default=False,  help="URL file")
+    paser.add_argument("-o", "--output", dest="output", default='.',  help="output file name")
+    paser.add_argument("-u", "--url", dest="url", default=False)
+    args = paser.parse_args()
+
+    if args.file:
+        for url in open(args.file).read().split("\n"):
+            if url.strip() == '':
+                continue
+            if url[-1] == '/':
+                url = url[:-1]
+            wfname = os.path.basename(url)
+            fp = open(args.output + '/' + wfname + '.html', 'w')
+            fp.write(trans_so_from_url(url).encode('utf-8'))
+            fp.close()
+
+    elif args.url:
+        url = args.url
+        if args.output == '.':
+            print trans_so_from_url(url)
+        else:
+            fp = open(args.output, 'w')
+            fp.write(trans_so_from_url(url).encode('utf-8'))
+            fp.close()
