@@ -8,6 +8,9 @@ import thread, threading, sys
 
 from googletrans import Translator
 from argparse import ArgumentParser
+import html2text
+
+import socket
 
 translator = Translator()
 
@@ -48,6 +51,8 @@ def dom_to_html(T):
 
 def trans_so_from_url(url):
     T = get_dom_from_url(url)
+    head = get_header(T)
+
     data = T.findall('//div[@class="post-text"]')
 
     out = []
@@ -69,7 +74,26 @@ def trans_so_from_url(url):
         res = '\n'.join([q for _, q in ps]).replace('</ ', '</')
         #print res
         out.append(res)
-    return '\n'.join(out).encode('utf-8')
+
+    body = html2text('\n'.join(out))
+    content = head + '\n\n' + body
+    return content.encode('utf-8')
+
+def get_header(T):
+    title = T.find('//div[@id="question-header"]/h1/a').text #translator.translate(T.find('//div[@id="question-header"]/h1/a').text, src='en', dest='zh-CN')
+    tags = '\n\t'.join(['- ' + a.text for a in T.findall('//div[@class="post-taglist"]/a')])
+    head = '''---
+title: %s
+date: 2018-01-14 09:49:19
+tags:
+\t%s
+---
+
+''' % (
+        title,
+        tags
+    )
+    return head
 
 
 #url = "https://stackoverflow.com/questions/231767/what-does-the-yield-keyword-do"
@@ -88,7 +112,7 @@ if __name__ == '__main__':
             if url[-1] == '/':
                 url = url[:-1]
             wfname = os.path.basename(url)
-            fp = open(args.output + '/' + wfname + '.html', 'w')
+            fp = open(args.output + '/' + wfname + '.md', 'w')
             fp.write(trans_so_from_url(url))
             fp.close()
 
