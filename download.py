@@ -18,6 +18,7 @@ translator = Translator()
 
 html_parser = HTMLParser()
 
+delta_d = 1
 def html_parse(html):
     return html_parser.unescape(html)
 
@@ -56,6 +57,7 @@ def trans_so_from_url(url):
     data = T.findall('//div[@class="post-text"]')
 
     out = []
+    n = 0
     for d in data[:3]:
         xs = d.findall('./')
         ps = []
@@ -74,25 +76,33 @@ def trans_so_from_url(url):
         res = '\n'.join([q for _, q in ps]).replace('</ ', '</')
         #print res
         out.append(res)
+        n += 1
+        if n == 1:
+            out.append('[more]')
 
-    body = html2text.html2text('\n'.join(out)).replace('`\n', '`').replace('\n]', ']')
-    content = head + '\n\n' + body
+    body = html2text.html2text('\n'.join(out)).replace('[more]', '<!-- more -->').replace('`\n', '`').replace('\n]', ']').replace('[\n', '[')
+    content = '\n\n'.join([head, body])
     return content.encode('utf-8')
 
+from datetime import datetime, timedelta
 def get_header(T):
-    title = T.find('//div[@id="question-header"]/h1/a').text #translator.translate(T.find('//div[@id="question-header"]/h1/a').text, src='en', dest='zh-CN')
-    tags = '\n\t'.join(['- ' + a.text for a in T.findall('//div[@class="post-taglist"]/a')])
+    global delta_d
+    title = translator.translate(T.find('//div[@id="question-header"]/h1/a').text, src='en', dest='zh-CN').text
+    tags = '\n\t'.join(['- ' + a.text for a in T.findall('//div[@class="post-taglist"]/a') if a.text is not None])
+    dt = datetime.now() + timedelta(days=delta_d)
     head = '''---
 title: %s
-date: 2018-01-14 09:49:19
+date: %s
 tags:
 \t%s
 ---
 
 ''' % (
         title,
+	dt.strftime('%Y-%m-%d %H:%M:%S'),
         tags
     )
+    delta_d += 1
     return head
 
 
@@ -112,8 +122,14 @@ if __name__ == '__main__':
             if url[-1] == '/':
                 url = url[:-1]
             wfname = os.path.basename(url)
+            fn = args.output + '/' + wfname + '.md'
+            if os.path.exists(fn) and os.path.getsize(fn) > 0:
+                continue
             fp = open(args.output + '/' + wfname + '.md', 'w')
-            fp.write(trans_so_from_url(url))
+            try:
+                fp.write(trans_so_from_url(url))
+            except Exception:
+                print '[error]', url
             fp.close()
 
     elif args.url:
