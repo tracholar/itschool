@@ -75,7 +75,7 @@ def trans_so_from_url(url):
         #print res
         out.append(res)
 
-    body = html2text('\n'.join(out))
+    body = html2text.html2text('\n'.join(out)).replace('`\n', '`').replace('\n]', ']')
     content = head + '\n\n' + body
     return content.encode('utf-8')
 
