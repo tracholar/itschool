@@ -48,8 +48,12 @@ def get_dom_from_url(url):
 def dom_to_html(T):
     return etree.tostring(T, method='html')
 
-
-
+def dom_to_text(T):
+    return etree.tostring(T, method='text')
+def html_to_text(html):
+    return dom_to_text(get_dom_from_html(html))
+CODE = u'1j2l4n3k4n32m43n'
+code_pat = re.compile(r'<code>.+?</code>')
 def trans_so_from_url(url):
     T = get_dom_from_url(url)
     head = get_header(T)
@@ -58,13 +62,22 @@ def trans_so_from_url(url):
 
     out = []
     n = 0
+  
     for d in data[:3]:
         xs = d.findall('./')
         ps = []
         ts = [] #fanyi
+        cs = []
         for i, x in enumerate(xs):
             if x.tag in ('p', 'ul', 'ol'):
-                ts.append((i, dom_to_html(x)))
+                html = dom_to_html(x)
+                m = code_pat.findall(html)
+                
+                if m:
+                    #print m 
+                    html = code_pat.sub(CODE, html)
+                    cs = cs + m
+                ts.append((i, html_to_text(html)))
             else:
                 ps.append((i, dom_to_html(x)))
 
@@ -73,14 +86,16 @@ def trans_so_from_url(url):
 
         #print zh
         ps = sorted(ps + [(i, a.text) for i,a in zip(ids, zh)], key=lambda x:x[0])
-        res = '\n'.join([q for _, q in ps]).replace('</ ', '</')
+        res = '\n'.join([q for _, q in ps])
+        for code in cs:
+            res = res.replace(CODE, code, 1)
         #print res
         out.append(res)
         n += 1
         if n == 1:
             out.append('[more]')
 
-    body = html2text.html2text('\n'.join(out)).replace('[more]', '<!-- more -->').replace('`\n', '`').replace('\n]', ']').replace('[\n', '[')
+    body = html2text.html2text('\n'.join(out)).replace('[more]', '<!-- more -->\n')
     content = '\n\n'.join([head, body])
     return content.encode('utf-8')
 
