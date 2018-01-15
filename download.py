@@ -95,16 +95,17 @@ def trans_so_from_url(url):
         if n == 1:
             out.append('[more]')
 
-    body = html2text.html2text('\n'.join(out)).replace('[more]', '<!-- more -->\n')
+    body = html2text.html2text('\n'.join(out)).replace('[more]', '<!-- more -->\n\n')
     content = '\n\n'.join([head, body])
     return content.encode('utf-8')
 
 from datetime import datetime, timedelta
 def get_header(T):
-    global delta_d
     title = translator.translate(T.find('//div[@id="question-header"]/h1/a').text, src='en', dest='zh-CN').text
     tags = '\n\t'.join(['- ' + a.text for a in T.findall('//div[@class="post-taglist"]/a') if a.text is not None])
-    dt = datetime.now() + timedelta(days=delta_d)
+    d = T.find('//div[@id="question-header"]/h1/a').attrib['href'].split('/')[2]
+    d = int(d) % 100
+    dt = datetime(2018, 1, 14, 10, 0, 0) - timedelta(days=d)
     head = '''---
 title: %s
 date: %s
@@ -117,7 +118,6 @@ tags:
 	dt.strftime('%Y-%m-%d %H:%M:%S'),
         tags
     )
-    delta_d += 1
     return head
 
 
