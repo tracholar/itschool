@@ -6,3 +6,4 @@ data
 *.md
 *.txt
 *.out
+*.py[cxd]
