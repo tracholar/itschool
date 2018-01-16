@@ -11,13 +11,13 @@ print links
 
 for r,t in links:
     print r
-    #title = translator.translate(t, src='en', dest='zh-CN').text
+    title = translator.translate(t, src='en', dest='zh-CN').text
 
 
     T = get_dom_from_url(r)
 
     html = trans_html(T, '//div[@itemprop="articleBody"]')
-    data = html2text.html2text(html, r)
+    data = '#' + title + '\n\n' + html2text.html2text(html, r)
 
     fwname = os.path.basename(r) + '.md'
     file_put_content(fwname, data)
