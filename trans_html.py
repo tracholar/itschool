@@ -53,8 +53,8 @@ img_pat = re.compile(r'<img.+?>', re.M|re.S|re.I|re.U)
 def trans_html(T, xpath=None):
     if type(T) is str:
         T = get_dom_from_html(T)
-    if type(T) is not etree._ElementTree:
-        raise Exception("Not supporse!")
+    if type(T)  not in (etree._ElementTree, etree._Element):
+        raise Exception("Not supporse!" + str(type(T)))
 
     if xpath is not None:
         T = T.find(xpath)
