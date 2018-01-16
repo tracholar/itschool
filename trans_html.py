@@ -65,6 +65,7 @@ def trans_html(T, xpath=None):
         raise Exception("Not supporse!" + str(type(T)))
 
     if xpath is not None:
+        print xpath
         T = T.find(xpath)
     
     xs = T.findall('./')
