@@ -47,6 +47,9 @@ def html_to_text(html):
 
 CODE = 'CXJ743-HDK-53L'
 code_pat = re.compile(r'<code>.+?</code>')
+
+IMG = 'IMG32-4234jk3j4k3j4k'
+img_pat = re.compile(r'<img.+?/(img)?>')
 def trans_html(T, xpath=None):
     if type(T) is str:
         T = get_dom_from_html(T)
@@ -60,6 +63,7 @@ def trans_html(T, xpath=None):
     ps = []
     ts = [] #fanyi
     cs = []
+    imgs = []
     ts_tag_s = {}
     for i, x in enumerate(xs):
         if x.tag in ('p', 'ul', 'ol', 'blockquote', 'h1', 'h2', 'h3', 'h4', 'h5' , 'h6', 'aside'):
@@ -70,6 +74,11 @@ def trans_html(T, xpath=None):
                 #print m
                 html = code_pat.sub(CODE, html)
                 cs = cs + m
+
+            m = img_pat.findall(html)
+            if m:
+                html = img_pat.sub(IMG, html)
+                imgs = imgs + m
             ts.append((i, html_to_text(html)))
             ts_tag_s[i] = x.tag
         else:
@@ -83,6 +92,8 @@ def trans_html(T, xpath=None):
     res = '\n'.join([q for _, q in ps])
     for code in cs:
         res = res.replace(CODE, code, 1)
+    for im in imgs:
+        res = res.replace(IMG, im, 1)
 
     return res
 
