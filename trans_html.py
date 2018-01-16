@@ -8,9 +8,17 @@ from googletrans import Translator
 from argparse import ArgumentParser
 import html2text
 
+
+
 translator = Translator()
 
 html_parser = HTMLParser()
+
+
+def file_put_content(fn, data):
+    fp = open(fn, 'w')
+    fp.write(data)
+    fp.close()
 
 def html_parse(html):
     return html_parser.unescape(html)
