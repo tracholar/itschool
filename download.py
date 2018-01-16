@@ -11,49 +11,9 @@ from argparse import ArgumentParser
 import html2text
 
 import socket
-
-translator = Translator()
-
+from trans_html import *
 
 
-html_parser = HTMLParser()
-
-delta_d = 1
-def html_parse(html):
-    return html_parser.unescape(html)
-
-
-def get_data_from_url(url):
-
-    print '[visit]', url
-    headers = {
-        'User-Agent':'Mozilla/5.0 (Windows NT 6.3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.91 Safari/537.36',
-    }
-    req = urllib2.Request(url, headers = headers)
-    try:
-        data = urllib2.urlopen(req).read()
-    except Exception:
-        data = ''
-    return data
-
-def get_dom_from_html(html):
-    return etree.parse(StringIO(html), etree.HTMLParser())
-
-def get_dom_from_url(url):
-    html = get_data_from_url(url)
-    html = html.replace('<ol>', '<ul>').replace('</ol>', '</ul>').replace('<sub>', '').replace('</sub>', '')
-    T = get_dom_from_html(html)
-    return T
-
-def dom_to_html(T):
-    return etree.tostring(T, method='html')
-
-def dom_to_text(T):
-    return etree.tostring(T, method='text')
-def html_to_text(html):
-    return dom_to_text(get_dom_from_html(html))
-CODE = u'1j2l4n3k4n32m43n'
-code_pat = re.compile(r'<code>.+?</code>')
 def trans_so_from_url(url):
     T = get_dom_from_url(url)
     head = get_header(T)
@@ -64,31 +24,8 @@ def trans_so_from_url(url):
     n = 0
   
     for d in data[:3]:
-        xs = d.findall('./')
-        ps = []
-        ts = [] #fanyi
-        cs = []
-        for i, x in enumerate(xs):
-            if x.tag in ('p', 'ul', 'ol'):
-                html = dom_to_html(x)
-                m = code_pat.findall(html)
-                
-                if m:
-                    #print m 
-                    html = code_pat.sub(CODE, html)
-                    cs = cs + m
-                ts.append((i, html_to_text(html)))
-            else:
-                ps.append((i, dom_to_html(x)))
+        res = trans_html(d)
 
-        ids = [i for i,_ in ts]
-        zh = translator.translate( [q for _, q in ts], src='en', dest='zh-CN')
-
-        #print zh
-        ps = sorted(ps + [(i, '<p>' + a.text + '</p>') for i,a in zip(ids, zh)], key=lambda x:x[0])
-        res = '\n'.join([q for _, q in ps])
-        for code in cs:
-            res = res.replace(CODE, code, 1)
         #print res
         out.append(res)
         n += 1
