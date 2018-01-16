@@ -31,7 +31,7 @@ print sorted(tags.items(), key=lambda x: -x[1])[:50]
 
 if True:
     tags = set(['html', 'python', 'javascript', 'java', 'c-sharp', 'php', 'bash', 'android', 'dot-net', 'css', 'shell', 'jquery', 'linux', 'unix', 'mysql', 'xml', 'html5','http',
-                '区块链', '机器学习'])
+                '区块链', '机器学习','android'])
 
     for f in  fs:
         data = open(f).read()
