@@ -85,7 +85,7 @@ def trans_so_from_url(url):
         zh = translator.translate( [q for _, q in ts], src='en', dest='zh-CN')
 
         #print zh
-        ps = sorted(ps + [(i, a.text) for i,a in zip(ids, zh)], key=lambda x:x[0])
+        ps = sorted(ps + [(i, '<p>' + a.text + '</p>') for i,a in zip(ids, zh)], key=lambda x:x[0])
         res = '\n'.join([q for _, q in ps])
         for code in cs:
             res = res.replace(CODE, code, 1)
