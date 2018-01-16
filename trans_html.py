@@ -49,7 +49,7 @@ CODE = 'CXJ743-HDK-53L'
 code_pat = re.compile(r'<code>.+?</code>')
 
 IMG = 'IMG32-4234jk3j4k3j4k'
-img_pat = re.compile(r'<img.+?/(img)?>')
+img_pat = re.compile(r'<img.+?>', re.M|re.S|re.I|re.U)
 def trans_html(T, xpath=None):
     if type(T) is str:
         T = get_dom_from_html(T)
