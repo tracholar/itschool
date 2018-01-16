@@ -98,7 +98,7 @@ def trans_html(T, xpath=None):
 
     #print zh
     ps = sorted(ps + [(i, '<' + ts_tag_s[i] + '>' + a.text + '</' + ts_tag_s[i] + '>') for i,a in zip(ids, zh)], key=lambda x:x[0])
-    res = '\n<!-- more -->\n'.join([q for _, q in ps])
+    res = '\n'.join([q for _, q in ps])
     for code in cs:
         res = res.replace(CODE, code, 1)
     for im in imgs:
