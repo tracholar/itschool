@@ -75,7 +75,7 @@ def trans_html(T, xpath=None):
     imgs = []
     ts_tag_s = {}
     for i, x in enumerate(xs):
-        if x.tag in ('p', 'ul', 'ol', 'blockquote', 'h1', 'h2', 'h3', 'h4', 'h5' , 'h6', 'aside'):
+        if x.tag in ('p', 'li', 'td', 'dd', 'dl', 'blockquote', 'h1', 'h2', 'h3', 'h4', 'h5' , 'h6', 'aside'):
             html = dom_to_html(x)
             m = code_pat.findall(html)
 
@@ -90,8 +90,8 @@ def trans_html(T, xpath=None):
                 imgs = imgs + m
             ts.append((i, html_to_text(html)))
             ts_tag_s[i] = x.tag
-        elif x.tag is 'div':
-            ps.append((i, trans_html(x)))
+        elif x.tag in ('div', 'section', 'table', 'ul', 'ol', 'tr', 'tbody', 'thead'):
+            ps.append((i, '<' + x.tag + '>' + trans_html(x) + '</' + x.tag + '>'))
         else:
             ps.append((i, dom_to_html(x)))
 
