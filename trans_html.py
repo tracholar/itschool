@@ -49,7 +49,7 @@ def get_dom_from_url(url):
 def dom_to_html(T):
     return etree.tostring(T, method='html')
 def dom_to_text(T):
-    return etree.tostring(T, method='text')
+    return etree.tostring(T, method='text', encoding='utf-8')
 def html_to_text(html):
     return dom_to_text(get_dom_from_html(html))
 
@@ -113,5 +113,5 @@ def trans_html(T, xpath=None):
 
 if __name__ == '__main__':
     html = get_dom_from_url(sys.argv[1])
-    print trans_html(html, sys.argv[2])
+    print html2text.html2text(trans_html(html, sys.argv[2]))
 
