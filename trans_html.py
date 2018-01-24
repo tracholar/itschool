@@ -90,6 +90,8 @@ def trans_html(T, xpath=None):
                 imgs = imgs + m
             ts.append((i, html_to_text(html)))
             ts_tag_s[i] = x.tag
+        elif x.tag is 'div':
+            ps.append((i, trans_html(x)))
         else:
             ps.append((i, dom_to_html(x)))
 
